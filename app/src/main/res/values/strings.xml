@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">wallpaperApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="categories">
+        <item>Backgrounds</item>
+        <item>Fashion</item>
+        <item>Nature</item>
+        <item>Science</item>
+        <item>Education</item>
+        <item>Feelings</item>
+        <item>Health</item>
+        <item>People</item>
+        <item>Religion</item>
+        <item>Places</item>
+        <item>Animals</item>
+        <item>Industry</item>
+        <item>Computer</item>
+        <item>Sports</item>
+        <item>Transportation</item>
+        <item>Travel</item>
+        <item>Buildings</item>
+        <item>Business</item>
+        <item>Music</item>
+    </string-array>
+
+    <string-array name="category_images">
+        <item>https://pixabay.com/get/53e6d3424256ae14f1dc846096293f781736d8e1554c704f752c79d69245c750_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3434853a914f1dc846096293f781736d8e1554c704f752c79d69244cd5a_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3464a55a814f1dc846096293f781736d8e1554c704f752c79d6914dc05a_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d6414c57ac14f1dc846096293f781736d8e1554c704f752c79d6914cc25c_640.jpg</item>
+        <item>https://pixabay.com/get/57e6d0464d5aaf14f1dc846096293f781736d8e1554c704f752c79d6914cc25c_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3474f57af14f1dc846096293f781736d8e1554c704f752c79d69148c559_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d043425ba814f1dc846096293f781736d8e1554c704f752c79d6914bc45a_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d6444f5aa914f1dc846096293f781736d8e1554c704f752c79d69145c251_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d6474b52ab14f1dc846096293f781736d8e1554c704f752c79d69144c55e_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3404b57ae14f1dc846096293f781736d8e1554c704f752c79d69144c25f_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3474e50a914f1dc846096293f781736d8e1554c704f752c79d6904dc550_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d64b4f54a414f1dc846096293f781736d8e1554c704f752c79d6904dc65f_640.jpg</item>
+        <item>https://pixabay.com/get/53e5dd414d55a914f1dc846096293f781736d8e1554c704f752c79d6904dcc51_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3424f56ae14f1dc846096293f781736d8e1554c704f752c79d6904cc45e_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3434e55ac14f1dc846096293f781736d8e1554c704f752c79d6904cc05b_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3414e56ac14f1dc846096293f781736d8e1554c704f752c79d6904ccc51_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d0414854ad14f1dc846096293f781736d8e1554c704f752c79d6904fc751_640.jpg</item>
+        <item>https://pixabay.com/get/53e6d3414f57ae14f1dc846096293f781736d8e1554c704f752c79d6904fc35c_640.jpg</item>
+        <item>https://pixabay.com/get/53e5dc474d52ae14f1dc846096293f781736d8e1554c704f752c79d6904fcd5d_640.jpg</item>
+    </string-array>
+</resources>
