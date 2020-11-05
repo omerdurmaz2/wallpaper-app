@@ -3,18 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.library.LibraryFragment">
+    tools:context=".view.search.ResultFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvLibrary"
+        android:id="@+id/rvSearch"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-
-
-
     <LinearLayout
-        android:id="@+id/llLibraryNoResult"
+        android:id="@+id/llSearchNoResult"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical|center_horizontal"
@@ -23,7 +20,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/library_no_downloaded_image" />
+            android:text="@string/search_no_result" />
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/fragmentResultBackButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_language_button"
+        android:elevation="4dp"
+        android:src="@drawable/ic_baseline_arrow_back_24" />
 </RelativeLayout>

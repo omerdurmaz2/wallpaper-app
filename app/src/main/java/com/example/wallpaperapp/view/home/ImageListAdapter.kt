@@ -1,10 +1,7 @@
-package com.example.wallpaperapp.view
+package com.example.wallpaperapp.view.home
 
-import android.app.ActionBar
-import android.content.ComponentCallbacks
 import android.content.Context
 import android.net.Uri
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

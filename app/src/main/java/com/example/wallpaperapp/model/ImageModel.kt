@@ -13,8 +13,8 @@ open class ImageModel : Serializable {
     @SerializedName("largeImageURL")
     var largeImageURL: String? = null
 
-    @SerializedName("fullHDURL")
-    var fullHDURL: String? = null
+    @SerializedName("previewURL")
+    var previewURL: String? = null
 
     @SerializedName("webformatURL")
     var webformatURL: String? = null

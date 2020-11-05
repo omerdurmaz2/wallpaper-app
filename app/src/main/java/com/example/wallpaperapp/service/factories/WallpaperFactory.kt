@@ -11,11 +11,13 @@ interface WallpaperFactory {
     @GET("/api/")
     fun getWallpapers(
         @Query("key") key: String? = WallPaperApi.apiKey,
+        @Query("lang") lang: String?,
         @Query("q") search: String?,
         @Query("image_type") image_type: String? = "photo",
         @Query("page") page: Int?,
         @Query("per_page") perPage: Int?,
-        @Query("category") category: String?
+        @Query("category") category: String?,
+        @Query("order") order: String? = "popular"
     ): Call<WallpaperResponse>
 
 }

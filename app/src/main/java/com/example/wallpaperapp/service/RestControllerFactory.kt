@@ -30,7 +30,7 @@ class RestControllerFactory {
         }
     }
 
-        fun getWallpaperFactory(): WallpaperFactory {
+    fun getWallpaperFactory(): WallpaperFactory {
         return wallpaperFactory
     }
 }

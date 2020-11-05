@@ -4,17 +4,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.wallpaperapp.R
 import com.example.wallpaperapp.view.*
+import com.example.wallpaperapp.view.home.HomeFragment
+import com.example.wallpaperapp.view.library.LibraryFragment
+import com.example.wallpaperapp.view.photo.PhotoFragment
+import com.example.wallpaperapp.view.search.ResultFragment
+import com.example.wallpaperapp.view.search.SearchFragment
 
 class NavigationHelper {
 
-    companion object {
 
+    companion object {
         private val instance: NavigationHelper = NavigationHelper()
-        var selectedCategory: String = ""
         fun getInstance(): NavigationHelper {
             return instance
         }
-
     }
 
     private constructor()
@@ -24,36 +27,36 @@ class NavigationHelper {
         fm: FragmentManager
     ) {
         val homeFragment = HomeFragment()
-        replaceFragment(fm, R.id.flContent, homeFragment, null, false)
+        replaceFragment(fm, R.id.flContent, homeFragment, null, "home", false)
     }
 
     fun toSearch(
         fm: FragmentManager
     ) {
         val searchFragment = SearchFragment()
-        replaceFragment(fm, R.id.flContent, searchFragment, null, false)
+        replaceFragment(fm, R.id.flContent, searchFragment, null, "search", false)
     }
 
 
-    fun toProfile(
+    fun toLibrary(
         fm: FragmentManager
     ) {
         val profileFragment = LibraryFragment()
-        replaceFragment(fm, R.id.flContent, profileFragment, null, false)
+        replaceFragment(fm, R.id.flContent, profileFragment, null, "library", false)
     }
 
     fun toImageDetail(
         fm: FragmentManager
     ) {
         val photoFragment = PhotoFragment()
-        replaceFragment(fm, R.id.flContent, photoFragment, null, true)
+        replaceFragment(fm, R.id.flContent, photoFragment, null, "imageDetaile", true)
     }
 
-    fun toCategoryImages(
+    fun toSearchResults(
         fm: FragmentManager
     ) {
-        val categoryFragment = CategoryFragment()
-        replaceFragment(fm, R.id.flContent, categoryFragment, null, true)
+        val resultFragment = ResultFragment()
+        replaceFragment(fm, R.id.flContent, resultFragment, null, "searchResults", true)
     }
 
     private fun replaceFragment(
@@ -61,18 +64,37 @@ class NavigationHelper {
         id: Int,
         fragment: Fragment,
         stackText: String?,
+        tag: String?,
         isAddToBackStack: Boolean
     ) {
-        if (isAddToBackStack) {
-            fm.beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(id, fragment).addToBackStack(stackText)
-                .commit()
+        val currentFragment = fm.findFragmentById(R.id.flContent)
+        if (!currentFragment?.tag.equals(tag)) {
 
-        } else {
-            fm.beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(id, fragment).commitAllowingStateLoss()
+            currentFragment?.tag?.let { fragTag ->
+                MainActivity.fragmentSavedState.put(fragTag,
+                    currentFragment.let { frag -> fm.saveFragmentInstanceState(frag) })
+            }
+
+            if (isAddToBackStack) {
+                fragment.let {
+                    fm.beginTransaction()
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,android.R.anim.fade_in, android.R.anim.fade_out)
+                        .replace(id, it, tag).addToBackStack(stackText).commit()
+                }
+            } else {
+                fragment.setInitialSavedState(MainActivity.fragmentSavedState[tag])
+                fragment.let {
+                    fm.beginTransaction()
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .replace(id, it, tag).commit()
+                }
+            }
+
         }
+
+
     }
+
+
+
 }

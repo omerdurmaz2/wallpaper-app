@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">wallpaperApp</string>
     <string-array name="categories">
         <item>Arka Plan</item>
         <item>Moda</item>
@@ -23,26 +22,36 @@
         <item>Müzik</item>
     </string-array>
 
-    <string-array name="category_images">
-        <item>https://pixabay.com/get/53e6d3424256ae14f1dc846096293f781736d8e1554c704f752c79d69245c750_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3434853a914f1dc846096293f781736d8e1554c704f752c79d69244cd5a_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3464a55a814f1dc846096293f781736d8e1554c704f752c79d6914dc05a_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d6414c57ac14f1dc846096293f781736d8e1554c704f752c79d6914cc25c_640.jpg</item>
-        <item>https://pixabay.com/get/57e6d0464d5aaf14f1dc846096293f781736d8e1554c704f752c79d6914cc25c_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3474f57af14f1dc846096293f781736d8e1554c704f752c79d69148c559_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d043425ba814f1dc846096293f781736d8e1554c704f752c79d6914bc45a_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d6444f5aa914f1dc846096293f781736d8e1554c704f752c79d69145c251_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d6474b52ab14f1dc846096293f781736d8e1554c704f752c79d69144c55e_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3404b57ae14f1dc846096293f781736d8e1554c704f752c79d69144c25f_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3474e50a914f1dc846096293f781736d8e1554c704f752c79d6904dc550_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d64b4f54a414f1dc846096293f781736d8e1554c704f752c79d6904dc65f_640.jpg</item>
-        <item>https://pixabay.com/get/53e5dd414d55a914f1dc846096293f781736d8e1554c704f752c79d6904dcc51_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3424f56ae14f1dc846096293f781736d8e1554c704f752c79d6904cc45e_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3434e55ac14f1dc846096293f781736d8e1554c704f752c79d6904cc05b_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3414e56ac14f1dc846096293f781736d8e1554c704f752c79d6904ccc51_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d0414854ad14f1dc846096293f781736d8e1554c704f752c79d6904fc751_640.jpg</item>
-        <item>https://pixabay.com/get/53e6d3414f57ae14f1dc846096293f781736d8e1554c704f752c79d6904fc35c_640.jpg</item>
-        <item>https://pixabay.com/get/53e5dc474d52ae14f1dc846096293f781736d8e1554c704f752c79d6904fcd5d_640.jpg</item>
+    <string-array name="category_colors">
+        <item>#003f88</item>
+        <item>#b56576</item>
+        <item>#2a9d8f</item>
+        <item>#ffbe0b</item>
+        <item>#f2b5d4</item>
+        <item>#e52f2e</item>
+        <item>#621708</item>
+        <item>#2c5530</item>
+        <item>#0e103d</item>
+        <item>#db7c26</item>
+        <item>#494949</item>
+        <item>#0a2463</item>
+        <item>#aacc00</item>
+        <item>#2a9d8f</item>
+        <item>#6c757d</item>
+        <item>#495057</item>
+        <item>#e36414</item>
+        <item>#9ec1a3</item>
+        <item>#1DB954</item>
     </string-array>
-
+    <string name="error_loading_images">Resimler yüklenirken bir hata oluştu! Lütfen daha sonra tekrar deneyin</string>
+    <string name="library_no_downloaded_image">İndirilmiş görsel yok!</string>
+    <string name="photo_wallpaper_set">Duvar kağıdı ayarlandı.</string>
+    <string name="photo_download_failed">İndirme Başarısız!</string>
+    <string name="photo_downlaod_paused">Durdurlu!</string>
+    <string name="photo_download_pending">Bekliyor...</string>
+    <string name="photo_download_downloading">İndiriliyor...</string>
+    <string name="photo_download_succesfull">Resim başarıyla indirildi!</string>
+    <string name="photo_download_error">İndirilecek birşey yok!</string>
+    <string name="search_no_result">Aramanızla eşleşen öge yok.</string>
+    <string name="dialog_language_select_language">Dil Seç</string>
 </resources>

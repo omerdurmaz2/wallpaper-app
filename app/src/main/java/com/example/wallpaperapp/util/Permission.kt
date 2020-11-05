@@ -1,8 +1,8 @@
-package com.example.wallpaperapp.view
+package com.example.wallpaperapp.util
 
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
-import kotlin.math.acos
+import com.example.wallpaperapp.view.MainActivity
 
 class Permission(val activity: MainActivity) {
     val permissions = arrayOf(

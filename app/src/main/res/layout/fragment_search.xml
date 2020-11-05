@@ -3,12 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.SearchFragment">
+    tools:context=".view.search.SearchFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCategories"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:id="@+id/llSearch"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="50dp"
         android:background="@drawable/custom_style_search_layout"
         android:orientation="horizontal"
         android:paddingStart="22.5dp"
@@ -18,13 +23,23 @@
         <EditText
             android:id="@+id/etSearchImage"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7"
+            android:textColor="@color/colorBlack"
+            android:background="@color/transparent"
+            android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:imeOptions="actionSearch"
+            android:selectAllOnFocus="true" />
+
+        <ImageButton
+            android:id="@+id/ibDeleteText"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
-            android:background="@color/transparent" />
+            android:layout_weight="0.1"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_baseline_close_24"
+            android:visibility="invisible" />
 
         <ImageButton
             android:id="@+id/ivSearchButton"
@@ -32,30 +47,13 @@
             android:layout_height="match_parent"
             android:layout_weight="0.2"
             android:background="@drawable/custom_style_search_button_layout"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_bottom_navigation_search" />
-<!--        <ImageView
-            android:id="@+id/ivSearchButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:background="@drawable/custom_style_search_button_layout"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_bottom_navigation_search" />-->
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_search" />
+
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSearch"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/llSearch"
-        android:visibility="gone" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCategories"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/llSearch" />
+
 
 </RelativeLayout>

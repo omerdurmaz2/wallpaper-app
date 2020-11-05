@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:gravity="center_horizontal"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/CategoryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/dialog_language_select_language"
+        android:textColor="@color/colorPrimary" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnTurkish"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/custom_dialog_language_button"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_flag_tr" />
+
+
+        <ImageButton
+            android:id="@+id/btnEnglish"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/custom_dialog_language_button"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_flag_en" />
+    </LinearLayout>
+</LinearLayout>

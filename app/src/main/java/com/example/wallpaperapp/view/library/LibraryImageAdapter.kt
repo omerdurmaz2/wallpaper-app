@@ -1,11 +1,11 @@
-package com.example.wallpaperapp.view
+package com.example.wallpaperapp.view.library
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperapp.R
 import kotlinx.android.synthetic.main.item_library_images.view.*
@@ -52,12 +52,10 @@ class LibraryImageAdapter(
             clickListener(imageList?.get(position))
         }
 
-/*        holder.itemView.(View.OnLongClickListener {
-            longClickListener(imageList?.get(position))
-            Toast.makeText(context, "Adapter", Toast.LENGTH_SHORT)
-
-            true
-        })*/
+       holder.itemView.setOnLongClickListener(View.OnLongClickListener {
+            
+           true
+       })
 
 
     }
