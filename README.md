@@ -1,3 +1,10 @@
-# WALLPAPER APP 
+# wallpaper app
 
-Henüz geliştirme aşamasında olan uygulamamda bedava olan pixabay resim servisinden gelen resimleri kategorilerine göre ya da aramanıza göre seçip, telefonunuza indirebilir ya da otomatik olarak telefon duvar kağıdı ayarlayabilirsiniz. Kendimi geliştirmek ve yeni şeyler öğrenmek için yapmış olduğum bu uygulamam tamamlandığımda play.store hesabımda da indirilebilir olacaktır.
+This app size that I have developed allows you to discover new photos on Pixabay and download them to your phone. Also note as wallpaper in an automatic sequence!
+
+#### Home
+![](https://github.com/omerdurmaz2/wallpaper-app/blob/main/home.gif)
+#### Search
+![](https://github.com/omerdurmaz2/wallpaper-app/blob/main/search.gif)
+#### Library
+![](https://github.com/omerdurmaz2/wallpaper-app/blob/main/library.gif)
