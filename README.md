@@ -1,7 +1,12 @@
 # wallpaper app
 
-This app size that I have developed allows you to discover new photos on Pixabay and download them to your phone. Also note as wallpaper in an automatic sequence!
+The possibilities provided by this application that I have developed using the [pixabay.com](https://pixabay.com/tr/) services.
 
+* Discover the latest pictures
+* Image download
+* Automatic wallpaper setting
+* Multiple language options
+* Small application size
 #### Home
 ![](https://github.com/omerdurmaz2/wallpaper-app/blob/main/home.gif)
 #### Search
