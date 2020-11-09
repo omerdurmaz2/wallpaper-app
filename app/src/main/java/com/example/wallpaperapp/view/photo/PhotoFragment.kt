@@ -112,8 +112,6 @@ class PhotoFragment : Fragment() {
     }
 
     private fun downloadClick() {
-        MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1) }
-
         btnDownload.setOnClickListener {
             MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1) }
         }
