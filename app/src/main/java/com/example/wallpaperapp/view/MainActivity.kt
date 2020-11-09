@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         var searchText = ""
 
         var homeLoaded = false
-        var libraryLoaded = false
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

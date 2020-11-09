@@ -46,8 +46,7 @@ class LibraryFragment : Fragment() {
         setUI()
         initViews(view)
         (activity as MainActivity).showLoadingDialog()
-        if (!MainActivity.libraryLoaded) setDirectory()
-        else bindImages(fileList)
+        setDirectory()
         (activity as MainActivity).hideLoadingDialog()
 
     }
@@ -83,6 +82,7 @@ class LibraryFragment : Fragment() {
     }
 
     private fun getFiles(root: File) {
+        fileList.clear()
         val listAllFiles = root.listFiles()
         if (listAllFiles != null && listAllFiles.isNotEmpty()) {
             for (currentFile in listAllFiles) {
@@ -90,7 +90,6 @@ class LibraryFragment : Fragment() {
                     fileList.add(currentFile.absoluteFile)
                 }
             }
-            MainActivity.libraryLoaded = true
             bindImages(fileList)
         } else {
             recyclerView.visibility = View.GONE
