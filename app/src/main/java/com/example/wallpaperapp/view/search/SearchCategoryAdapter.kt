@@ -2,16 +2,12 @@ package com.example.wallpaperapp.view.search
 
 import android.content.Context
 import android.graphics.Color
-import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperapp.R
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.item_search_category.view.*
-import java.util.*
 
 class SearchCategoryAdapter(
     val context: Context?,
@@ -23,15 +19,7 @@ class SearchCategoryAdapter(
 
     class ImageViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
-        fun bind(
-            context: Context?,
-            category: String,
-        ) {
-            if (context != null) {
-                itemView.tvSearchCategory.text = category
-            }
-        }
-
+        val category: TextView = view.findViewById(R.id.tvSearchCategory)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -41,13 +29,14 @@ class SearchCategoryAdapter(
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bind(context, categories[position])
+        holder.category.text = categories[position]
+
         holder.itemView.setBackgroundColor(Color.parseColor(category_colors[position]))
+
         holder.itemView.setOnClickListener {
             clickListener(position)
         }
     }
-
 
 
     override fun getItemCount(): Int {

@@ -1,31 +1,42 @@
 package com.example.wallpaperapp.view
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
-import android.widget.ViewAnimator
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.example.wallpaperapp.R
+import com.example.wallpaperapp.databinding.ActivityMainBinding
 import com.example.wallpaperapp.dialog.LanguageDialog
 import com.example.wallpaperapp.dialog.LoadingDialog
 import com.example.wallpaperapp.util.NavigationHelper
 import com.example.wallpaperapp.util.Permission
+import com.example.wallpaperapp.util.ext.gone
+import com.example.wallpaperapp.util.ext.visible
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.squareup.picasso.Picasso
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.HashMap
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+
+    private var binding: ActivityMainBinding? = null
 
     companion object {
         lateinit var selectedImage: WeakReference<String>
@@ -38,14 +49,22 @@ class MainActivity : AppCompatActivity() {
         lateinit var languageButton: ImageButton
         private val FRAGMENT_STATE = "fragmentState"
         var searchText = ""
+        var category: String? = null
 
         var homeLoaded = false
     }
 
+
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding?.root)
+
+        Picasso.setSingletonInstance(
+            Picasso.Builder(this) // additional settings
+                .build()
+        )
 
 
         languageDialog()
@@ -62,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         loadingDialog.isCancelable = false
         permission = WeakReference(Permission(this))
         loadLanguage()
+
 
     }
 
@@ -93,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
 
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -148,22 +167,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         applicationContext.cacheDir.deleteRecursively()
+        binding = null
         super.onDestroy()
     }
 
 
-     fun showLoadingDialog() {
+    fun showLoadingDialog() {
         loadingDialog.show(supportFragmentManager, "LoadingDialog")
     }
 
-     fun hideLoadingDialog() {
+    fun hideLoadingDialog() {
         loadingDialog.dismiss()
     }
 
-    open fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG)
+
+    fun showBottomNavigation() {
+        binding?.bottomNavigationView?.visible()
     }
 
+    fun hideBottomNavigation() {
+        binding?.bottomNavigationView?.gone()
+    }
 
 
 }

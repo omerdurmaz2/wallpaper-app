@@ -2,14 +2,15 @@ package com.example.wallpaperapp.view.home
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperapp.R
 import com.example.wallpaperapp.model.ImageModel
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.item_home_images.view.*
 
 class ImageListAdapter(
     val context: Context?,
@@ -21,14 +22,7 @@ class ImageListAdapter(
     private var imageList: List<ImageModel>? = ivList
 
     class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(
-            context: Context?,
-            image: ImageModel
-        ) {
-            if (context != null) {
-                Picasso.get().load(Uri.parse(image.webformatURL)).into(itemView.ivItemHomeImage)
-            }
-        }
+        val image: ImageView = itemView.findViewById(R.id.ivItemHomeImage)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -38,13 +32,15 @@ class ImageListAdapter(
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        imageList?.get(position)?.let { holder.bind(context, it) }
+
+        Picasso.get().load(Uri.parse(imageList?.get(position)?.webformatURL)).into(holder.image)
+
         holder.itemView.setOnClickListener {
             clickListener(imageList?.get(position)?.largeImageURL)
         }
     }
 
     override fun getItemCount(): Int {
-        return imageList?.size!!
+        return imageList?.size ?: 0
     }
 }

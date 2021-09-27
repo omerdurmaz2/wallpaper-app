@@ -6,7 +6,9 @@ import com.example.wallpaperapp.service.factories.WallpaperFactory
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
+@Singleton
 class RestControllerFactory {
 
     private var wallpaperFactory: WallpaperFactory
@@ -18,7 +20,6 @@ class RestControllerFactory {
     }
 
     companion object {
-        val instance = RestControllerFactory()
         const val timeoutInterval = 60L
         var client = OkHttpClient()
 

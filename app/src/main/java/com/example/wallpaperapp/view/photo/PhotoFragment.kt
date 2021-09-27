@@ -3,7 +3,6 @@ package com.example.wallpaperapp.view.photo
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
-import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
@@ -18,112 +17,83 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.core.content.FileProvider
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.example.wallpaperapp.BuildConfig
 import com.example.wallpaperapp.R
-import com.example.wallpaperapp.R.color.bb_inActiveBottomBarItemColor
+import com.example.wallpaperapp.base.BaseFragment
+import com.example.wallpaperapp.databinding.FragmentPhotoBinding
+import com.example.wallpaperapp.util.ext.gone
 import com.example.wallpaperapp.view.MainActivity
+import com.example.wallpaperapp.view.home.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.fragment_photo.view.*
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import java.net.URL
 
+@AndroidEntryPoint
+class PhotoFragment : BaseFragment<FragmentPhotoBinding>(R.layout.fragment_photo) {
 
-class PhotoFragment : Fragment() {
+    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentPhotoBinding
+        get() = FragmentPhotoBinding::inflate
 
-    private var imageView: ImageView? = null
-    private var lastDownloadStatus: Int? = null
+    private val viewModel: PhotoViewModel by viewModels()
+
     private lateinit var savedImageDirectory: File
-    lateinit var btnBack: ImageButton
-    lateinit var btnSetWallpaper: ImageButton
-    lateinit var btnDownload: ImageButton
     private val setWallpaper = MutableLiveData<Boolean>()
     private var fileName = ""
     val REQUEST_CODE = 2000
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun init() {
 
-        return inflater.inflate(R.layout.fragment_photo, container, false)
-    }
-
-
-    @SuppressLint("RestrictedApi")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setUI()
-        initViews(view)
-        onBackPressed()
+        (activity as MainActivity).hideBottomNavigation()
         bindImage()
-        if (MainActivity.isLocal.get()!!) {
-            view.btnDownlaod.visibility = View.GONE
-        }
-        setWallpaperClick(view)
-        downloadClick()
+        if (MainActivity.isLocal.get() == true) binding.btnDownlaod.gone()
+
         Handler(Looper.getMainLooper()).postDelayed({
-            (activity as MainActivity).hideLoadingDialog()
+            hideLoadingIndicator()
         }, 500)
 
         setWallpaper.observe(viewLifecycleOwner, Observer {
-            Log.e("sss","observed")
+            Log.e("sss", "observed")
             if (it)
                 setWallPaper()
         })
     }
 
-    private fun setUI() {
-        (context as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-            View.GONE
-    }
-
 
     private fun bindImage() {
-        activity?.applicationContext?.let {
-            imageView?.let { it1 ->
-                if (MainActivity.isLocal.get()!!) Picasso.get()
-                    .load(File(MainActivity.selectedImage.get()!!))
-                    .into(it1)
-                else Picasso.get().load(Uri.parse(MainActivity.selectedImage.get()!!)).into(it1)
 
-
-            }
+        Picasso.get().apply {
+            if (MainActivity.isLocal.get() == true) load(
+                File(
+                    MainActivity.selectedImage.get() ?: ""
+                )
+            )
+            else load(MainActivity.selectedImage.get() ?: "")
+                .into(binding.ivSelectedImage)
         }
+
     }
 
-    private fun initViews(view: View) {
-        imageView = view.findViewById(R.id.ivSelectedImage)
-        btnBack = view.findViewById(R.id.fragmentPhotoBackButton)
-        btnDownload = view.findViewById(R.id.btnDownlaod)
-        btnSetWallpaper = view.findViewById(R.id.btnSetWallpaper)
-    }
 
-    private fun onBackPressed() {
-        btnBack.setOnClickListener { activity?.onBackPressed() }
-    }
-
-    private fun setWallpaperClick(view: View) {
-
-        btnSetWallpaper.setOnClickListener {
+    override fun initClickListeners() {
+        super.initClickListeners()
+        binding.btnSetWallpaper.setOnClickListener {
             MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1, true) }
-            showSnackBar(view, getString(R.string.photo_wallpaper_set))
+            showSnackBar(binding.root, getString(R.string.photo_wallpaper_set))
         }
-
-    }
-
-    private fun downloadClick() {
-        btnDownload.setOnClickListener {
+        binding.btnBack.setOnClickListener {
+            activity?.onBackPressed()
+        }
+        binding.btnDownlaod.setOnClickListener {
             MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1) }
         }
     }
+
 
     private fun setWallPaper() {
         try {
@@ -153,7 +123,7 @@ class PhotoFragment : Fragment() {
             intent.addCategory(Intent.CATEGORY_DEFAULT)
             intent.setDataAndType(uriFile, "image/*")
             intent.putExtra(".jpg", "image/*")
-            intent.   addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             startActivity(Intent.createChooser(intent, "set wallpaper"))
 
 
@@ -185,7 +155,7 @@ class PhotoFragment : Fragment() {
     var lastMsg = ""
     private fun downloadImage(imageURL: String, sWP: Boolean? = false) {
 
-Log.e("sss","download image")
+        Log.e("sss", "download image")
         try {
             var directory = File(Environment.DIRECTORY_PICTURES)
             if (!directory.exists()) {

@@ -1,91 +1,60 @@
 package com.example.wallpaperapp.view.search
 
 import android.annotation.SuppressLint
-
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperapp.R
+import com.example.wallpaperapp.base.BaseFragment
+import com.example.wallpaperapp.databinding.FragmentSearchBinding
 import com.example.wallpaperapp.util.NavigationHelper
+import com.example.wallpaperapp.util.ext.gone
+import com.example.wallpaperapp.util.ext.invisible
+import com.example.wallpaperapp.util.ext.visible
 import com.example.wallpaperapp.view.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.fragment_search.*
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_search) {
 
 
-class SearchFragment : Fragment() {
+    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSearchBinding
+        get() = FragmentSearchBinding::inflate
 
-    private lateinit var recyclerViewCategory: RecyclerView
-    private lateinit var etSearchText: EditText
-    private lateinit var btnSearch: ImageButton
-    private lateinit var btnDeleteText: ImageButton
+
+    private val viewModel: SearchViewModel by viewModels()
     private var searchCategoryAdapter: SearchCategoryAdapter? = null
-    private var categoryScrollPosition = 0
-    private val CATEGORIES = listOf(
-        "backgrounds",
-        "fashion",
-        "nature",
-        "science",
-        "education",
-        "feelings",
-        "health",
-        "people",
-        "religion",
-        "places",
-        "animals",
-        "industry",
-        "computer",
-        "sports",
-        "transportation",
-        "travel",
-        "buildings",
-        "business",
-        "music"
-    )
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         if (savedInstanceState != null) {
-            categoryScrollPosition = savedInstanceState.getInt("categoryScrollPosition")
+            viewModel.categoryScrollPosition = savedInstanceState.getInt("categoryScrollPosition")
         }
-
-        return inflater.inflate(R.layout.fragment_search, container, false)
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun init() {
         setUI()
-        initViews(view)
         search()
         deleteSearchText()
         initRecyclerView()
     }
 
-    private fun initViews(view: View) {
-        recyclerViewCategory = view.findViewById(R.id.rvCategories)
-        etSearchText = view.findViewById(R.id.etSearchImage)
-        btnSearch = view.findViewById(R.id.ivSearchButton)
-        btnDeleteText = view.findViewById(R.id.ibDeleteText)
-
-    }
-
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt("categoryScrollPosition", categoryScrollPosition)
+        outState.putInt("categoryScrollPosition", viewModel.categoryScrollPosition)
         super.onSaveInstanceState(outState)
     }
 
@@ -93,37 +62,7 @@ class SearchFragment : Fragment() {
     private fun setUI() {
         (context as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
             R.id.bottom_navigation_search
-        (context as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-            View.VISIBLE
-
-    }
-
-
-    private fun search() {
-        btnSearch.setOnClickListener {
-            if (etSearchText.text != null && etSearchImage.text.trim() != "") {
-                MainActivity.searchText = etSearchImage.text.toString()
-                etSearchText.text.forEach { _ ->
-                    MainActivity.searchText.replace(".", "+")
-                    MainActivity.searchText.replace(",", "+")
-                    MainActivity.searchText.replace(" ", "+")
-                    MainActivity.searchText.replace("-", "+")
-                }
-                recyclerViewCategory.visibility = View.GONE
-            }
-
-            ResultFragment.isLoaded = false
-
-            (activity as MainActivity).showLoadingDialog()
-
-            activity?.supportFragmentManager?.let { it1 ->
-                NavigationHelper.getInstance().toSearchResults(
-                    it1
-                )
-            }
-        }
-        etSearchText.addTextChangedListener(textWatcher())
-        etSearchText.setOnEditorActionListener(actionListener())
+       (activity as MainActivity).hideBottomNavigation()
     }
 
 
@@ -131,7 +70,7 @@ class SearchFragment : Fragment() {
         return object : TextView.OnEditorActionListener {
             override fun onEditorAction(p0: TextView?, p1: Int, p2: KeyEvent?): Boolean {
                 if (p1 == EditorInfo.IME_ACTION_SEARCH) {
-                    btnSearch.performClick()
+                    binding.ivSearchButton.performClick()
                     return true
                 }
                 return false
@@ -147,10 +86,10 @@ class SearchFragment : Fragment() {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (etSearchText.text.equals("") || etSearchText.text.isEmpty() || etSearchText.text == null) {
-                    btnDeleteText.visibility = View.INVISIBLE
+                if (binding.etSearchImage.text.equals("") || binding.etSearchImage.text.isEmpty() || binding.etSearchImage.text == null) {
+                    binding.ibDeleteText.invisible()
                 } else {
-                    btnDeleteText.visibility = View.VISIBLE
+                    binding.ibDeleteText.visible()
                 }
             }
 
@@ -161,17 +100,17 @@ class SearchFragment : Fragment() {
     }
 
     private fun deleteSearchText() {
-        btnDeleteText.setOnClickListener {
-            btnDeleteText.visibility = View.INVISIBLE
-            etSearchText.text = null
-            etSearchText.clearFocus()
+        binding.ibDeleteText.setOnClickListener {
+            binding.ibDeleteText.invisible()
+            binding.etSearchImage.text.clear()
+            binding.etSearchImage.clearFocus()
         }
     }
 
     private fun initRecyclerView() {
-        recyclerViewCategory.visibility = View.VISIBLE
+        binding.rvCategories.visible()
         val gridLayoutManager = GridLayoutManager(activity?.applicationContext, 2)
-        recyclerViewCategory.layoutManager = gridLayoutManager
+        binding.rvCategories.layoutManager = gridLayoutManager
         searchCategoryAdapter = SearchCategoryAdapter(
             activity?.applicationContext,
             resources.getStringArray(R.array.categories),
@@ -179,25 +118,50 @@ class SearchFragment : Fragment() {
         ) {
 
 
-            ResultFragment.isLoaded = false
-            MainActivity.searchText = CATEGORIES[it!!]
-            (activity as MainActivity).showLoadingDialog()
+            MainActivity.category = viewModel.categories[it ?: 0]
+            showLoadingIndicator()
 
             activity?.supportFragmentManager?.let { navigation ->
                 NavigationHelper.getInstance().toSearchResults(navigation)
             }
 
         }
-        recyclerViewCategory.adapter = searchCategoryAdapter
+        binding.rvCategories.adapter = searchCategoryAdapter
 
 
-        if (categoryScrollPosition != 0)
-            recyclerViewCategory.scrollToPosition(categoryScrollPosition)
+        if (viewModel.categoryScrollPosition != 0)
+            binding.rvCategories.scrollToPosition(viewModel.categoryScrollPosition)
         else
-            categoryScrollPosition = recyclerViewCategory.verticalScrollbarPosition
+            viewModel.categoryScrollPosition = binding.rvCategories.verticalScrollbarPosition
     }
 
+    private fun search() {
 
+        binding.etSearchImage.addTextChangedListener(textWatcher())
+        binding.etSearchImage.setOnEditorActionListener(actionListener())
+        binding.ivSearchButton.setOnClickListener {
+            if (binding.etSearchImage.text != null && binding.etSearchImage.text.trim() != "") {
+                MainActivity.searchText = binding.etSearchImage.text.toString()
+                binding.etSearchImage.text.forEach { _ ->
+                    MainActivity.searchText.replace(".", "+")
+                    MainActivity.searchText.replace(",", "+")
+                    MainActivity.searchText.replace(" ", "+")
+                    MainActivity.searchText.replace("-", "+")
+                }
+                binding.rvCategories.gone()
+            }
+
+
+            showLoadingIndicator()
+
+            activity?.supportFragmentManager?.let { it1 ->
+                NavigationHelper.getInstance().toSearchResults(
+                    it1
+                )
+            }
+        }
+
+    }
 }
 
 
