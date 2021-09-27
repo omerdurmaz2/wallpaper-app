@@ -152,17 +152,18 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    open fun showLoadingDialog() {
+     fun showLoadingDialog() {
         loadingDialog.show(supportFragmentManager, "LoadingDialog")
     }
 
-    open fun hideLoadingDialog() {
+     fun hideLoadingDialog() {
         loadingDialog.dismiss()
     }
 
     open fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG)
     }
+
 
 
 }

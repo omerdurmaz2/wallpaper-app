@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,8 @@ import android.widget.ImageView
 import androidx.core.content.FileProvider
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.example.wallpaperapp.BuildConfig
 import com.example.wallpaperapp.R
 import com.example.wallpaperapp.R.color.bb_inActiveBottomBarItemColor
@@ -40,7 +43,7 @@ class PhotoFragment : Fragment() {
     lateinit var btnBack: ImageButton
     lateinit var btnSetWallpaper: ImageButton
     lateinit var btnDownload: ImageButton
-
+    private val setWallpaper = MutableLiveData<Boolean>()
     private var fileName = ""
     val REQUEST_CODE = 2000
 
@@ -66,9 +69,15 @@ class PhotoFragment : Fragment() {
         }
         setWallpaperClick(view)
         downloadClick()
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             (activity as MainActivity).hideLoadingDialog()
         }, 500)
+
+        setWallpaper.observe(viewLifecycleOwner, Observer {
+            Log.e("sss","observed")
+            if (it)
+                setWallPaper()
+        })
     }
 
     private fun setUI() {
@@ -104,9 +113,8 @@ class PhotoFragment : Fragment() {
     private fun setWallpaperClick(view: View) {
 
         btnSetWallpaper.setOnClickListener {
-            setWallPaper()
+            MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1, true) }
             showSnackBar(view, getString(R.string.photo_wallpaper_set))
-
         }
 
     }
@@ -131,7 +139,7 @@ class PhotoFragment : Fragment() {
 
             val uriFile: Uri? =
                 activity?.let {
-                    FileProvider.getUriForFile(
+                    getUriForFile(
                         it,
                         "com.example.wallpaperapp",
                         image
@@ -141,13 +149,12 @@ class PhotoFragment : Fragment() {
             Log.i("sss", "path: $uriFile")
 
 
-            val intent = Intent(Intent.ACTION_SET_WALLPAPER)
+            val intent = Intent(Intent.ACTION_ATTACH_DATA)
             intent.addCategory(Intent.CATEGORY_DEFAULT)
             intent.setDataAndType(uriFile, "image/*")
-            intent.putExtra("mimeType", "image/*")
-            startActivity(intent)
-            /*val chooser = Intent.createChooser(intent, "set wallpaper")
-            startActivity(chooser)*/
+            intent.putExtra(".jpg", "image/*")
+            intent.   addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(Intent.createChooser(intent, "set wallpaper"))
 
 
         } catch (e: Exception) {
@@ -176,9 +183,9 @@ class PhotoFragment : Fragment() {
 
     var msg: String? = ""
     var lastMsg = ""
-    private fun downloadImage(imageURL: String, setWallpaper: Boolean? = false) {
+    private fun downloadImage(imageURL: String, sWP: Boolean? = false) {
 
-
+Log.e("sss","download image")
         try {
             var directory = File(Environment.DIRECTORY_PICTURES)
             if (!directory.exists()) {
@@ -213,6 +220,9 @@ class PhotoFragment : Fragment() {
                     cursor.moveToFirst()
                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                         downloading = false
+                        if (sWP == true) {
+                            setWallpaper.postValue(true)
+                        }
                     }
                     val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
                     msg = statusMessage(imageURL, directory, status)
@@ -238,9 +248,6 @@ class PhotoFragment : Fragment() {
                 }
             }).start()
 
-            if (setWallpaper!!) {
-                setWallPaper()
-            }
 
         } catch (e: Exception) {
             Log.e("sss", "Download Error: " + e.localizedMessage)
