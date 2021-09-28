@@ -59,7 +59,7 @@ class ResultFragment : BaseFragment<FragmentResultBinding>(R.layout.fragment_res
 
     @SuppressLint("CutPasteId")
     private fun setUI() {
-        (context as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
+        (activity as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
             R.id.bottom_navigation_search
         (activity as MainActivity).showBottomNavigation()
     }
@@ -118,7 +118,7 @@ class ResultFragment : BaseFragment<FragmentResultBinding>(R.layout.fragment_res
     private fun openImage(image: String?) {
         MainActivity.selectedImage = WeakReference(image ?: "")
         MainActivity.isLocal = WeakReference(false)
-        (activity as MainActivity).showLoadingDialog()
+        showLoadingIndicator()
 
         activity?.supportFragmentManager?.let { NavigationHelper.getInstance().toImageDetail(it) }
     }

@@ -60,9 +60,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
 
     @SuppressLint("CutPasteId")
     private fun setUI() {
-        (context as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
+        (activity as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
             R.id.bottom_navigation_search
-       (activity as MainActivity).hideBottomNavigation()
+       (activity as MainActivity).showBottomNavigation()
     }
 
 

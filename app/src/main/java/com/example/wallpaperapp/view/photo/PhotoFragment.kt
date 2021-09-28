@@ -83,14 +83,24 @@ class PhotoFragment : BaseFragment<FragmentPhotoBinding>(R.layout.fragment_photo
     override fun initClickListeners() {
         super.initClickListeners()
         binding.btnSetWallpaper.setOnClickListener {
-            MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1, true) }
-            showSnackBar(binding.root, getString(R.string.photo_wallpaper_set))
+
+            (activity as MainActivity).checkPermissions {
+                if (it) {
+                    MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1, true) }
+                    showSnackBar(binding.root, getString(R.string.photo_wallpaper_set))
+                }
+            }
+
         }
         binding.btnBack.setOnClickListener {
             activity?.onBackPressed()
         }
         binding.btnDownlaod.setOnClickListener {
-            MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1) }
+            (activity as MainActivity).checkPermissions {
+                if (it) {
+                    MainActivity.selectedImage.get()?.let { it1 -> downloadImage(it1) }
+                }
+            }
         }
     }
 
@@ -133,14 +143,6 @@ class PhotoFragment : BaseFragment<FragmentPhotoBinding>(R.layout.fragment_photo
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
 
     @SuppressLint("ResourceType")
     private fun showSnackBar(view: View, msg: String) {

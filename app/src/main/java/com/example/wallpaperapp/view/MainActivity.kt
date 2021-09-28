@@ -4,24 +4,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.example.wallpaperapp.R
 import com.example.wallpaperapp.databinding.ActivityMainBinding
 import com.example.wallpaperapp.dialog.LanguageDialog
 import com.example.wallpaperapp.dialog.LoadingDialog
 import com.example.wallpaperapp.util.NavigationHelper
-import com.example.wallpaperapp.util.Permission
+import com.example.wallpaperapp.util.PermissionUtil
 import com.example.wallpaperapp.util.ext.gone
 import com.example.wallpaperapp.util.ext.visible
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
@@ -37,21 +32,18 @@ class MainActivity : AppCompatActivity() {
 
 
     private var binding: ActivityMainBinding? = null
+    private lateinit var loadingDialog: LoadingDialog
+    private lateinit var languageDialog: LanguageDialog
+    private lateinit var languageButton: ImageButton
+    private val permissionUtil = PermissionUtil(this, this)
+    private val fragmentState = "fragmentState"
 
     companion object {
         lateinit var selectedImage: WeakReference<String>
-        lateinit var selectedCategory: WeakReference<String>
         lateinit var isLocal: WeakReference<Boolean>
-        lateinit var permission: WeakReference<Permission>
         lateinit var fragmentSavedState: HashMap<String, Fragment.SavedState?>
-        lateinit var loadingDialog: LoadingDialog
-        lateinit var languageDialog: LanguageDialog
-        lateinit var languageButton: ImageButton
-        private val FRAGMENT_STATE = "fragmentState"
         var searchText = ""
         var category: String? = null
-
-        var homeLoaded = false
     }
 
 
@@ -75,15 +67,17 @@ class MainActivity : AppCompatActivity() {
             fixAllIcons()
         } else {
             fragmentSavedState =
-                savedInstanceState.getSerializable(FRAGMENT_STATE) as HashMap<String, Fragment.SavedState?>
+                savedInstanceState.getSerializable(fragmentState) as HashMap<String, Fragment.SavedState?>
         }
         loadingDialog = LoadingDialog(this)
         loadingDialog.isCancelable = false
-        permission = WeakReference(Permission(this))
         loadLanguage()
-
+        permissionUtil.checkPermissions {}
 
     }
+
+    fun checkPermissions(callback: (Boolean) -> Unit) =
+        permissionUtil.checkPermissions { callback(it) }
 
     private fun fixAllIcons() {
         val menuView =
@@ -144,7 +138,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(FRAGMENT_STATE, fragmentSavedState)
+        outState.putSerializable(fragmentState, fragmentSavedState)
         super.onSaveInstanceState(outState)
     }
 
@@ -173,7 +167,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun showLoadingDialog() {
-        loadingDialog.show(supportFragmentManager, "LoadingDialog")
+        loadingDialog.show(supportFragmentManager, LoadingDialog::class.simpleName)
     }
 
     fun hideLoadingDialog() {

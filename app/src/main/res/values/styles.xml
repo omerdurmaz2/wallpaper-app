@@ -5,11 +5,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSurface">@color/colorWhite</item>
     </style>
 
     <style name="CategoryText" >
         <!-- Customize your theme here. -->
-        <item name="android:textSize">35dp</item>
+        <item name="android:textSize">36sp</item>
         <item name="android:fontFamily">@font/bebasneue_regular</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:textStyle">normal</item>

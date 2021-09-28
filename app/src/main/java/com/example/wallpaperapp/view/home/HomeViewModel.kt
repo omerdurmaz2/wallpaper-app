@@ -28,7 +28,7 @@ class HomeViewModel @Inject constructor(
     var imageList: ArrayList<ImageModel>? = ArrayList()
     var isloaded = false
     var totalImage = 0
-
+var position=-1
     fun pullWallpapers(page: Int, callback: (DataState) -> Unit) {
         try {
 
@@ -47,6 +47,9 @@ class HomeViewModel @Inject constructor(
                         if (response.isSuccessful) {
                             if (response.body()?.hits?.size != 0) {
                                 totalImage += 20
+
+                                 position = imageList?.size?:0
+                                response.body()?.hits?.let { imageList?.addAll(it) }
                                 callback(DataState.Success(response.body()?.hits))
                                 isloaded = true
                             }else {

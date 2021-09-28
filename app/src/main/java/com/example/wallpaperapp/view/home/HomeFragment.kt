@@ -60,7 +60,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
 
     override fun init() {
-        showLoadingIndicator()
         setUI()
         if (!viewModel.isloaded) {
             pullWallpapers(1)
@@ -81,10 +80,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     @SuppressLint("CutPasteId")
     private fun setUI() {
-        (context as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
+        (activity as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
             R.id.bottom_navigation_home
-        (context as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
-            View.VISIBLE
+        (activity as MainActivity).showBottomNavigation()
     }
 
 
@@ -117,20 +115,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
 
     private fun addToImageList(images: ArrayList<ImageModel>) {
-        val position = viewModel.imageList?.size
-        viewModel.imageList?.addAll(images)
-        position?.let { imageListAdapter?.notifyItemRangeInserted(it, position + 20) }
+
     }
 
     private fun pullWallpapers(page: Int) {
         showLoadingIndicator()
+        Log.e("sss", "pull wall")
         viewModel.pullWallpapers(page) {
+            Log.e("sss", "done")
+
             when (it) {
                 is DataState.Success<*> -> {
-                    addToImageList(it as ArrayList<ImageModel>)
+                    Log.e("sss", "success")
+                    imageListAdapter?.notifyItemRangeInserted(viewModel.position, viewModel.position + 20)
                     hideLoadingIndicator()
                 }
                 is DataState.Error -> {
+                    Log.e("sss", "fail")
                     hideLoadingIndicator()
                     showToast(getString(R.string.error_loading_images))
                 }
@@ -142,8 +143,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private fun openImage(image: String?) {
         MainActivity.selectedImage = WeakReference(image ?: "")
         MainActivity.isLocal = WeakReference(false)
-        (activity as MainActivity).showLoadingDialog()
-
+        showLoadingIndicator()
         activity?.supportFragmentManager?.let { NavigationHelper.getInstance().toImageDetail(it) }
     }
 
