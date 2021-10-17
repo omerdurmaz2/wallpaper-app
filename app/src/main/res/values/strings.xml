@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">wallpaperApp</string>
+    <string name="internet_connection_warning">You dont have internet connection!</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string-array name="categories">
         <item>Backgrounds</item>

@@ -8,7 +8,11 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCategories"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="60dp"
+        android:paddingBottom="60dp"
+         />
 
     <LinearLayout
         android:id="@+id/llSearch"
@@ -25,12 +29,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.7"
-            android:textColor="@color/colorBlack"
             android:background="@color/transparent"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
-            android:selectAllOnFocus="true" />
+            android:selectAllOnFocus="true"
+            android:textColor="@color/colorBlack" />
 
         <ImageButton
             android:id="@+id/ibDeleteText"
@@ -52,8 +56,6 @@
 
 
     </LinearLayout>
-
-
 
 
 </RelativeLayout>

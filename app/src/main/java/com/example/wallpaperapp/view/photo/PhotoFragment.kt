@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.example.wallpaperapp.R
 import com.example.wallpaperapp.base.BaseFragment
 import com.example.wallpaperapp.databinding.FragmentPhotoBinding
@@ -66,15 +67,23 @@ class PhotoFragment : BaseFragment<FragmentPhotoBinding>(R.layout.fragment_photo
 
 
     private fun bindImage() {
+        val circularProgress = context?.let { CircularProgressDrawable(it) }
+        circularProgress?.strokeWidth = 5f
+        circularProgress?.centerRadius = 30f
+        circularProgress?.start()
 
         Picasso.get().apply {
-            if (MainActivity.isLocal.get() == true) load(
-                File(
-                    MainActivity.selectedImage.get() ?: ""
-                )
-            )
-            else load(MainActivity.selectedImage.get() ?: "")
+            circularProgress?.let {
+                if (MainActivity.isLocal.get() == true)
+                    load(
+                        File(
+                            MainActivity.selectedImage.get() ?: ""
+                        )
+                    )
+                else load(MainActivity.selectedImage.get() ?: "")
+                .placeholder(it)
                 .into(binding.ivSelectedImage)
+            }
         }
 
     }
@@ -141,7 +150,6 @@ class PhotoFragment : BaseFragment<FragmentPhotoBinding>(R.layout.fragment_photo
             Log.e("sss", "error: ${e.localizedMessage}")
         }
     }
-
 
 
     @SuppressLint("ResourceType")

@@ -36,18 +36,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var languageDialog: LanguageDialog
     private lateinit var languageButton: ImageButton
     private val permissionUtil = PermissionUtil(this, this)
-    private val fragmentState = "fragmentState"
 
     companion object {
         lateinit var selectedImage: WeakReference<String>
         lateinit var isLocal: WeakReference<Boolean>
-        lateinit var fragmentSavedState: HashMap<String, Fragment.SavedState?>
-        var searchText = ""
-        var category: String? = null
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -61,14 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         languageDialog()
 
-        if (savedInstanceState == null) {
-            fragmentSavedState = HashMap()
-            selectTab(0)
-            fixAllIcons()
-        } else {
-            fragmentSavedState =
-                savedInstanceState.getSerializable(fragmentState) as HashMap<String, Fragment.SavedState?>
-        }
+        selectTab(0)
+        fixAllIcons()
         loadingDialog = LoadingDialog(this)
         loadingDialog.isCancelable = false
         loadLanguage()
@@ -88,14 +77,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private fun loadLanguage() {
         val pref: SharedPreferences = getSharedPreferences("Settings", Context.MODE_PRIVATE)
         val lang = pref.getString("lang", "tr")
         setLanguage(lang)
     }
 
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private fun languageDialog() {
         languageButton = findViewById(R.id.btnLangueage)
         languageButton.setOnClickListener {
@@ -109,7 +96,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private fun setLanguage(lang: String? = "tr") {
         val configuration = Configuration()
         Locale.setDefault(Locale(lang))
@@ -125,22 +111,6 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        for (i in permissions.indices) {
-            if (grantResults.isNotEmpty() && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-            }
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(fragmentState, fragmentSavedState)
-        super.onSaveInstanceState(outState)
-    }
 
     private fun selectTab(id: Int) {
         when (id) {
@@ -174,7 +144,6 @@ class MainActivity : AppCompatActivity() {
         loadingDialog.dismiss()
     }
 
-
     fun showBottomNavigation() {
         binding?.bottomNavigationView?.visible()
     }
@@ -182,6 +151,4 @@ class MainActivity : AppCompatActivity() {
     fun hideBottomNavigation() {
         binding?.bottomNavigationView?.gone()
     }
-
-
 }

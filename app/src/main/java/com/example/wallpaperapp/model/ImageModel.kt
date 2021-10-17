@@ -3,19 +3,15 @@ package com.example.wallpaperapp.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-open class ImageModel : Serializable {
+data class ImageModel(
     @SerializedName("id")
-    var id: Int? = null
-
+    val id: Int,
     @SerializedName("pageURL")
-    var pageURL: String? = null
-
+    val pageURL: String?,
     @SerializedName("largeImageURL")
-    var largeImageURL: String? = null
-
+    val largeImageURL: String?,
     @SerializedName("previewURL")
-    var previewURL: String? = null
-
+    val previewURL: String?,
     @SerializedName("webformatURL")
-    var webformatURL: String? = null
-}
+    val webformatURL: String?
+)

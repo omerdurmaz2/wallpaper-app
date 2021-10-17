@@ -7,40 +7,67 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.example.wallpaperapp.R
 import com.example.wallpaperapp.model.ImageModel
 import com.squareup.picasso.Picasso
 
 class ImageListAdapter(
     val context: Context?,
-    ivList: List<ImageModel>?,
+    var list: ArrayList<ImageModel?>,
     val clickListener: (String?) -> Unit
 
-) : RecyclerView.Adapter<ImageListAdapter.ImageViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var imageList: List<ImageModel>? = ivList
+    private val viewItem = 1
+    private val viewProg = 0
 
     class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = itemView.findViewById(R.id.ivItemHomeImage)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-        return ImageViewHolder(
+    class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    }
+
+
+    override fun getItemViewType(position: Int): Int {
+        return if (list[position] != null) viewItem else viewProg
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == viewItem) ImageViewHolder(
             LayoutInflater.from(context).inflate(R.layout.item_home_images, parent, false)
+        ) else LoadingViewHolder(
+            LayoutInflater.from(context).inflate(R.layout.item_home_images_loading, parent, false)
         )
     }
 
-    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is ImageViewHolder) {
+            val item = list[position]
 
-        Picasso.get().load(Uri.parse(imageList?.get(position)?.webformatURL)).into(holder.image)
+            val circularProgress = context?.let { CircularProgressDrawable(it) }
+            circularProgress?.strokeWidth = 5f
+            circularProgress?.centerRadius = 30f
+            circularProgress?.start()
 
-        holder.itemView.setOnClickListener {
-            clickListener(imageList?.get(position)?.largeImageURL)
+            circularProgress?.let {
+                Picasso.get().load(Uri.parse(item?.webformatURL)).placeholder(it)
+                    .into(holder.image)
+            }
+
+            holder.itemView.setOnClickListener {
+                clickListener(item?.largeImageURL)
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        return imageList?.size ?: 0
+        return list.size
     }
+
+
 }

@@ -62,7 +62,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
     private fun setUI() {
         (activity as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
             R.id.bottom_navigation_search
-       (activity as MainActivity).showBottomNavigation()
+        (activity as MainActivity).showBottomNavigation()
     }
 
 
@@ -116,15 +116,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
             resources.getStringArray(R.array.categories),
             resources.getStringArray(R.array.category_colors)
         ) {
-
-
-            MainActivity.category = viewModel.categories[it ?: 0]
-            showLoadingIndicator()
-
             activity?.supportFragmentManager?.let { navigation ->
-                NavigationHelper.getInstance().toSearchResults(navigation)
+                val bundle = Bundle()
+                bundle.putString("category", viewModel.categories[it ?: 0])
+                NavigationHelper.getInstance().toSearchResults(navigation, bundle)
             }
-
         }
         binding.rvCategories.adapter = searchCategoryAdapter
 
@@ -141,24 +137,25 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
         binding.etSearchImage.setOnEditorActionListener(actionListener())
         binding.ivSearchButton.setOnClickListener {
             if (binding.etSearchImage.text != null && binding.etSearchImage.text.trim() != "") {
-                MainActivity.searchText = binding.etSearchImage.text.toString()
+                val searchText = binding.etSearchImage.text.toString().trim()
                 binding.etSearchImage.text.forEach { _ ->
-                    MainActivity.searchText.replace(".", "+")
-                    MainActivity.searchText.replace(",", "+")
-                    MainActivity.searchText.replace(" ", "+")
-                    MainActivity.searchText.replace("-", "+")
+                    searchText.replace(".", "+")
+                    searchText.replace(",", "+")
+                    searchText.replace(" ", "+")
+                    searchText.replace("-", "+")
                 }
                 binding.rvCategories.gone()
+
+                activity?.supportFragmentManager?.let { it1 ->
+                    val bundle = Bundle()
+                    bundle.putString("searchText", searchText)
+                    NavigationHelper.getInstance().toSearchResults(
+                        it1
+                    )
+                }
             }
 
 
-            showLoadingIndicator()
-
-            activity?.supportFragmentManager?.let { it1 ->
-                NavigationHelper.getInstance().toSearchResults(
-                    it1
-                )
-            }
         }
 
     }

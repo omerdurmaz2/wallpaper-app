@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="internet_connection_warning">İnternet bağlantınız yok!</string>
+
     <string-array name="categories">
         <item>Arka Plan</item>
         <item>Moda</item>

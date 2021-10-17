@@ -1,5 +1,6 @@
 package com.example.wallpaperapp.util
 
+import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.wallpaperapp.R
@@ -53,9 +54,11 @@ class NavigationHelper {
     }
 
     fun toSearchResults(
-        fm: FragmentManager
+        fm: FragmentManager,
+        args: Bundle? = null
     ) {
         val resultFragment = ResultFragment()
+        resultFragment.arguments = args
         replaceFragment(fm, R.id.flContent, resultFragment, null, "searchResults", true)
     }
 
@@ -70,19 +73,18 @@ class NavigationHelper {
         val currentFragment = fm.findFragmentById(R.id.flContent)
         if (!currentFragment?.tag.equals(tag)) {
 
-            currentFragment?.tag?.let { fragTag ->
-                MainActivity.fragmentSavedState.put(fragTag,
-                    currentFragment.let { frag -> fm.saveFragmentInstanceState(frag) })
-            }
-
             if (isAddToBackStack) {
                 fragment.let {
                     fm.beginTransaction()
-                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,android.R.anim.fade_in, android.R.anim.fade_out)
+                        .setCustomAnimations(
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out,
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out
+                        )
                         .replace(id, it, tag).addToBackStack(stackText).commit()
                 }
             } else {
-                fragment.setInitialSavedState(MainActivity.fragmentSavedState[tag])
                 fragment.let {
                     fm.beginTransaction()
                         .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -94,7 +96,6 @@ class NavigationHelper {
 
 
     }
-
 
 
 }

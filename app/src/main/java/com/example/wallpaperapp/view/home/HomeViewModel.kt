@@ -1,21 +1,18 @@
 package com.example.wallpaperapp.view.home
 
-import android.annotation.SuppressLint
-import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.wallpaperapp.R
+import androidx.lifecycle.viewModelScope
 import com.example.wallpaperapp.base.DataState
 import com.example.wallpaperapp.model.ImageModel
 import com.example.wallpaperapp.model.WallpaperResponse
-import com.example.wallpaperapp.service.NetworkCallback
+import com.example.wallpaperapp.service.NetworkHelper
 import com.example.wallpaperapp.service.RestControllerFactory
-import com.example.wallpaperapp.service.WallPaperApi
-import com.example.wallpaperapp.util.ext.showToast
-import com.example.wallpaperapp.view.MainActivity
+import com.example.wallpaperapp.service.ResultWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
-import retrofit2.Response
-import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,53 +20,23 @@ class HomeViewModel @Inject constructor(
     private val restControllerFactory: RestControllerFactory
 ) : ViewModel() {
 
-    var currentPage = 1
-    var scrollPosition: Int = 0
-    var imageList: ArrayList<ImageModel>? = ArrayList()
-    var isloaded = false
-    var totalImage = 0
-var position=-1
-    fun pullWallpapers(page: Int, callback: (DataState) -> Unit) {
-        try {
+    var totalCount = 0
+    var currentPage = 0
+    var shouldLoad = true
+    var isLoading = false
+    val imageList = ArrayList<ImageModel?>()
+    private val _fetchResult = MutableLiveData<ResultWrapper<WallpaperResponse>>()
+    val fetchResult: LiveData<ResultWrapper<WallpaperResponse>> get() = _fetchResult
 
-            restControllerFactory.getWallpaperFactory()
-                .getWallpapers(
-                    WallPaperApi.apiKey, Locale.getDefault().displayLanguage,
-                    null, "photo", page, 20, null
+    fun pullWallpapers() {
+        currentPage++
+        isLoading = true
+        viewModelScope.launch {
+            _fetchResult.postValue(NetworkHelper.safeApiCall(Dispatchers.IO) {
+                restControllerFactory.getWallpaperFactory().getWallpapers(
+                    page = currentPage
                 )
-                .enqueue(object : NetworkCallback<WallpaperResponse>() {
-                    @SuppressLint("SetTextI18n", "ShowToast")
-                    override fun onResponse(
-                        call: Call<WallpaperResponse>,
-                        response: Response<WallpaperResponse>
-                    ) {
-
-                        if (response.isSuccessful) {
-                            if (response.body()?.hits?.size != 0) {
-                                totalImage += 20
-
-                                 position = imageList?.size?:0
-                                response.body()?.hits?.let { imageList?.addAll(it) }
-                                callback(DataState.Success(response.body()?.hits))
-                                isloaded = true
-                            }else {
-                                callback(DataState.Success(arrayListOf<ImageModel>()))
-                            }
-                        }else{
-                            callback(DataState.Error(""))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<WallpaperResponse>,
-                        t: Throwable
-                    ) {
-                        callback(DataState.Error(""))
-                    }
-                })
-        } catch (e: Exception) {
+            })
         }
     }
-
-
 }

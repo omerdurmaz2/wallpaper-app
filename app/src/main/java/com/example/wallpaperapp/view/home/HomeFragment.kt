@@ -1,6 +1,7 @@
 package com.example.wallpaperapp.view.home
 
 import android.annotation.SuppressLint
+import android.media.Image
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -8,7 +9,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperapp.R
@@ -19,6 +22,7 @@ import com.example.wallpaperapp.model.ImageModel
 import com.example.wallpaperapp.model.WallpaperResponse
 import com.example.wallpaperapp.service.NetworkCallback
 import com.example.wallpaperapp.service.RestControllerFactory
+import com.example.wallpaperapp.service.ResultWrapper
 import com.example.wallpaperapp.service.WallPaperApi
 import com.example.wallpaperapp.service.factories.WallpaperFactory
 import com.example.wallpaperapp.util.NavigationHelper
@@ -27,6 +31,8 @@ import com.example.wallpaperapp.util.ScrollListener
 import com.example.wallpaperapp.util.ext.showToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -43,42 +49,49 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
 
     private var imageListAdapter: ImageListAdapter? = null
-    private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel: HomeViewModel by viewModels()
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        if (savedInstanceState != null)
-            viewModel.scrollPosition = savedInstanceState.getInt("scrollPosition")
-        return super.onCreateView(inflater, container, savedInstanceState)
-
-    }
 
 
     override fun init() {
         setUI()
-        if (!viewModel.isloaded) {
-            pullWallpapers(1)
-            initRecyclerView()
-        } else {
-            initRecyclerView()
-            Handler().postDelayed({
-                (activity as MainActivity).hideLoadingDialog()
-            }, 100)
+        initRecyclerView()
+        pullWallpapers()
+        viewModel.fetchResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ResultWrapper.Success<*> -> {
+                    viewModel.isLoading = false
+                    val list = (it.value as WallpaperResponse).hits
+                    if (list?.isEmpty() == true) viewModel.shouldLoad = false
+                    else {
+
+                        if (viewModel.imageList.isNotEmpty()) viewModel.imageList.removeAt(viewModel.totalCount - 1)
+                        list?.let { it1 -> viewModel.imageList.addAll(it1) }
+                        viewModel.imageList.add(null)
+
+                        list?.size?.let { it1 ->
+                            imageListAdapter?.notifyItemRangeInserted(
+                                viewModel.totalCount,
+                                it1
+                            )
+                        }
+                        viewModel.totalCount = viewModel.imageList.size
+                    }
+                }
+                is ResultWrapper.GenericError -> {
+
+                }
+                is ResultWrapper.NetworkError -> {
+                    showToast(getString(R.string.internet_connection_warning))
+                    activity?.onBackPressed()
+                }
+                null -> {
+
+                }
+            }
         }
     }
 
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt("scrollPosition", viewModel.scrollPosition)
-        super.onSaveInstanceState(outState)
-    }
-
-    @SuppressLint("CutPasteId")
     private fun setUI() {
         (activity as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
             R.id.bottom_navigation_home
@@ -87,56 +100,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
 
     private fun initRecyclerView() {
-        binding.rvHome.setHasFixedSize(true)
-        linearLayoutManager = LinearLayoutManager(activity?.applicationContext)
-        binding.rvHome.layoutManager = linearLayoutManager
         imageListAdapter = ImageListAdapter(activity?.applicationContext, viewModel.imageList) {
             openImage(it)
         }
-        binding.rvHome.adapter = imageListAdapter
+        binding.rvHome.apply {
+            adapter = imageListAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
 
-        if (viewModel.scrollPosition != 0)
-            binding.rvHome.scrollToPosition(viewModel.scrollPosition)
 
-        binding.rvHome.addOnScrollListener(object :
-            ScrollListener(linearLayoutManager, viewModel.currentPage) {
-            override fun loadImages() {
-                currentPage++
-                viewModel.currentPage = currentPage
-                pullWallpapers(currentPage)
-                Handler().postDelayed({
-                    isLoading = false
-                    viewModel.scrollPosition = firstVisibleItem - 3
-                }, 500)
+        binding.nsHome.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
+            if (scrollY == v.getChildAt(0).measuredHeight - v.measuredHeight) {
+                if (!viewModel.isLoading && viewModel.shouldLoad) {
+                    pullWallpapers()
+                }
             }
         })
-
     }
 
-
-    private fun addToImageList(images: ArrayList<ImageModel>) {
-
-    }
-
-    private fun pullWallpapers(page: Int) {
-        showLoadingIndicator()
-        Log.e("sss", "pull wall")
-        viewModel.pullWallpapers(page) {
-            Log.e("sss", "done")
-
-            when (it) {
-                is DataState.Success<*> -> {
-                    Log.e("sss", "success")
-                    imageListAdapter?.notifyItemRangeInserted(viewModel.position, viewModel.position + 20)
-                    hideLoadingIndicator()
-                }
-                is DataState.Error -> {
-                    Log.e("sss", "fail")
-                    hideLoadingIndicator()
-                    showToast(getString(R.string.error_loading_images))
-                }
-            }
-        }
+    private fun pullWallpapers() {
+        viewModel.pullWallpapers()
     }
 
 

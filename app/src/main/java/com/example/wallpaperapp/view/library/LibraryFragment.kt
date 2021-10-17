@@ -9,57 +9,42 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperapp.R
+import com.example.wallpaperapp.base.BaseFragment
+import com.example.wallpaperapp.databinding.FragmentLibraryBinding
 import com.example.wallpaperapp.util.NavigationHelper
+import com.example.wallpaperapp.util.ext.gone
+import com.example.wallpaperapp.util.ext.showToast
+import com.example.wallpaperapp.util.ext.visible
 import com.example.wallpaperapp.view.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.ref.WeakReference
 
 
-class LibraryFragment : Fragment() {
+class LibraryFragment : BaseFragment<FragmentLibraryBinding>(R.layout.fragment_library) {
 
+    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentLibraryBinding
+        get() = FragmentLibraryBinding::inflate
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var llNoResult: LinearLayout
-    var scrollPosition = 0
 
     companion object {
         var fileList: ArrayList<File> = ArrayList()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        if (savedInstanceState != null)
-            scrollPosition = savedInstanceState.getInt("scrollPosition")
-        // Inflate the layout for this fragment
 
-        return inflater.inflate(R.layout.fragment_library, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun init() {
         setUI()
-        initViews(view)
-        (activity as MainActivity).showLoadingDialog()
-        setDirectory()
-        (activity as MainActivity).hideLoadingDialog()
-
+        showLoadingIndicator()
+        viewLifecycleOwner.lifecycleScope.launch {
+            setDirectory()
+        }
     }
 
-    private fun initViews(view: View) {
-        recyclerView = view.findViewById(R.id.rvLibrary)
-        llNoResult = view.findViewById(R.id.llLibraryNoResult)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt("scrollPosition", scrollPosition)
-        super.onSaveInstanceState(outState)
-    }
 
     @SuppressLint("CutPasteId")
     private fun setUI() {
@@ -92,39 +77,33 @@ class LibraryFragment : Fragment() {
             }
             bindImages(fileList)
         } else {
-            recyclerView.visibility = View.GONE
-            llNoResult.visibility = View.VISIBLE
+            binding.rvLibrary.gone()
+            binding.llLibraryNoResult.visible()
         }
+
+        hideLoadingIndicator()
 
     }
 
     private fun bindImages(fileList: ArrayList<File>) {
-        recyclerView.visibility = View.VISIBLE
-        llNoResult.visibility = View.GONE
+        binding.rvLibrary.visible()
+        binding.llLibraryNoResult.gone()
         val libraryImageAdapter = LibraryImageAdapter(activity?.applicationContext, fileList, {
             openImage(it?.absolutePath.toString())
         }) {
-
-            Toast.makeText(context, "Uzun basıldı", Toast.LENGTH_SHORT)
+            showToast("Uzun basıldı")
         }
-        val gridLayoutManager = GridLayoutManager(activity?.applicationContext, 2)
 
-        recyclerView.layoutManager = gridLayoutManager
-
-        recyclerView.adapter = libraryImageAdapter
-        if (scrollPosition != 0)
-            recyclerView.scrollToPosition(scrollPosition)
-        else
-            scrollPosition = recyclerView.verticalScrollbarPosition
-
-
+        binding.rvLibrary.apply {
+            layoutManager = GridLayoutManager(activity?.applicationContext, 2)
+            adapter = libraryImageAdapter
+        }
     }
 
     private fun openImage(image: String?) {
         MainActivity.selectedImage = WeakReference(image ?: "")
         MainActivity.isLocal = WeakReference(true)
-        (activity as MainActivity).showLoadingDialog()
-
+        showLoadingIndicator()
         activity?.supportFragmentManager?.let { NavigationHelper.getInstance().toImageDetail(it) }
     }
 

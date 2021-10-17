@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wallpaperapp.R
@@ -12,6 +13,8 @@ import com.example.wallpaperapp.base.BaseFragment
 import com.example.wallpaperapp.base.DataState
 import com.example.wallpaperapp.databinding.FragmentResultBinding
 import com.example.wallpaperapp.model.ImageModel
+import com.example.wallpaperapp.model.WallpaperResponse
+import com.example.wallpaperapp.service.ResultWrapper
 import com.example.wallpaperapp.util.NavigationHelper
 import com.example.wallpaperapp.util.ScrollListener
 import com.example.wallpaperapp.util.ext.invisible
@@ -33,31 +36,56 @@ class ResultFragment : BaseFragment<FragmentResultBinding>(R.layout.fragment_res
 
 
     private val viewModel: ResultViewModel by viewModels()
-    private lateinit var linearLayoutManager: LinearLayoutManager
     private var imageListAdapter: ImageListAdapter? = null
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        if (savedInstanceState != null) {
-            viewModel.imageScrollPosition = savedInstanceState.getInt("imageScrollPosition")
-            viewModel.currentPage = savedInstanceState.getInt("currentPage")
-        }
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun init() {
+        arguments?.let {
+            viewModel.searchText = it.getString("searchText")
+            viewModel.category = it.getString("category")
+        }
+
         setUI()
-        if (!viewModel.isloaded)
-            pullWallpapers(viewModel.currentPage, MainActivity.searchText, null)
         initRecyclerView()
+        pullWallpapers()
+
+
+        viewModel.fetchResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is ResultWrapper.Success<*> -> {
+                    viewModel.isLoading = false
+                    val list = (it.value as WallpaperResponse).hits
+                    if (list?.isEmpty() == true) viewModel.shouldLoad = false
+                    else {
+
+                        if (viewModel.imageList.isNotEmpty()) viewModel.imageList.removeAt(viewModel.totalCount - 1)
+                        list?.let { it1 -> viewModel.imageList.addAll(it1) }
+                        viewModel.imageList.add(null)
+
+                        list?.size?.let { it1 ->
+                            imageListAdapter?.notifyItemRangeInserted(
+                                viewModel.totalCount,
+                                it1
+                            )
+                        }
+                        viewModel.totalCount = viewModel.imageList.size
+                    }
+                }
+                is ResultWrapper.GenericError -> {
+
+                }
+                is ResultWrapper.NetworkError -> {
+                    showToast(getString(R.string.internet_connection_warning))
+                    activity?.onBackPressed()
+                }
+                null -> {
+
+                }
+            }
+        }
     }
 
 
-    @SuppressLint("CutPasteId")
     private fun setUI() {
         (activity as MainActivity).findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId =
             R.id.bottom_navigation_search
@@ -70,50 +98,27 @@ class ResultFragment : BaseFragment<FragmentResultBinding>(R.layout.fragment_res
         binding.btnResultBack.setOnClickListener { activity?.onBackPressed() }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt("imageScrollPosition", viewModel.imageScrollPosition)
-        outState.putInt("currentPage", viewModel.currentPage)
-        super.onSaveInstanceState(outState)
-    }
-
-
     private fun initRecyclerView() {
 
         binding.llSearchNoResult.invisible()
         binding.rvSearch.visible()
-        binding.rvSearch.setHasFixedSize(true)
-        linearLayoutManager = LinearLayoutManager(activity?.applicationContext)
-        binding.rvSearch.layoutManager = linearLayoutManager
+
         imageListAdapter = ImageListAdapter(activity?.applicationContext, viewModel.imageList) {
             openImage(it)
         }
-        binding.rvSearch.adapter = imageListAdapter
-
-        if (viewModel.imageScrollPosition != 0)
-            binding.rvSearch.scrollToPosition(viewModel.imageScrollPosition)
-        else
-            viewModel.imageScrollPosition = binding.rvSearch.verticalScrollbarPosition
-
-        binding.rvSearch.addOnScrollListener(object :
-            ScrollListener(linearLayoutManager, viewModel.currentPage) {
-            override fun loadImages() {
-                currentPage++
-                viewModel.currentPage = currentPage
-                pullWallpapers(currentPage, MainActivity.searchText, null)
-
+        binding.rvSearch.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = imageListAdapter
+        }
+        binding.nsResult.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
+            if (scrollY == v.getChildAt(0).measuredHeight - v.measuredHeight) {
+                if (!viewModel.isLoading && viewModel.shouldLoad) {
+                    pullWallpapers()
+                }
             }
         })
 
-
     }
-
-
-    private fun addToImageList(images: ArrayList<ImageModel>) {
-        val position = viewModel.imageList.size
-        viewModel.imageList.addAll(images)
-        position.let { imageListAdapter?.notifyItemRangeInserted(it, position + 20) }
-    }
-
 
     private fun openImage(image: String?) {
         MainActivity.selectedImage = WeakReference(image ?: "")
@@ -123,19 +128,7 @@ class ResultFragment : BaseFragment<FragmentResultBinding>(R.layout.fragment_res
         activity?.supportFragmentManager?.let { NavigationHelper.getInstance().toImageDetail(it) }
     }
 
-    private fun pullWallpapers(page: Int, query: String? = "flower", category: String?) {
-        showLoadingIndicator()
-        viewModel.pullWallpapers(page, query, category) {
-            when (it) {
-                is DataState.Success<*> -> {
-                    addToImageList(it as ArrayList<ImageModel>)
-                    hideLoadingIndicator()
-                }
-                is DataState.Error -> {
-                    hideLoadingIndicator()
-                    showToast(getString(R.string.error_loading_images))
-                }
-            }
-        }
+    private fun pullWallpapers() {
+        viewModel.pullWallpapers()
     }
 }

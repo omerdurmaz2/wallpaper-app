@@ -5,24 +5,35 @@ plugins {
     id 'dagger.hilt.android.plugin'
 }
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.example.wallpaperapp"
-        minSdkVersion 16
-        targetSdkVersion 30
+        minSdkVersion 21
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
-        release {
-            multiDexEnabled true
+        debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+            shrinkResources false
+            multiDexEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "Boolean", "DEBUG_MODE", "true"
+
+        }
+        release {
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            multiDexEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "Boolean", "DEBUG_MODE", "false"
         }
     }
 
@@ -77,5 +88,10 @@ dependencies {
 
     //Multidex
     implementation 'androidx.multidex:multidex:2.0.1'
+
+    //Chuck
+    debugImplementation "com.github.chuckerteam.chucker:library:3.4.0"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.4.0"
+
 
 }
